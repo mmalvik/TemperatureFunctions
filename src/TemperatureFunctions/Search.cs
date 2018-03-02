@@ -11,7 +11,7 @@ namespace TemperatureFunctions
     public static class Search
     {
         [FunctionName("Search")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "GetTemperatures/search")]HttpRequestMessage req, TraceWriter log)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "GetTemperatures/search")]HttpRequestMessage req, TraceWriter log)
         {
             var requestData = await req.Content.ReadAsStringAsync();
             log.Info($"GetTemperatures/query called with: \n {requestData}");
