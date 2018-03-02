@@ -17,13 +17,19 @@ namespace TemperatureFunctions
         [FunctionName("GetTemperatures")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "GetTemperatures/query")]HttpRequestMessage req, TraceWriter log)
         {
+            var dayMilliseconds = 86400000;
             long value = 1;
             var date = DateTime.Now;
 
             var timeseries = new TimeSeries
             {
-                Target = "target",
-                Datapoints = new long[][] { new long[] { value, date.MillisecondsFromUnixEpoch() } }
+                Target = "temperature",
+                Datapoints = new long[][]
+                {
+                    new long[] { 1, date.MillisecondsFromUnixEpoch() - (2*dayMilliseconds) },
+                    new long[] { 2, date.MillisecondsFromUnixEpoch() - dayMilliseconds },
+                    new long[] { 3, date.MillisecondsFromUnixEpoch() }
+                }
             };
 
             var json = JsonConvert.SerializeObject(timeseries);
