@@ -26,7 +26,7 @@ namespace TemperatureFunctions.Test
 
                 return new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StringContent("{logging}", Encoding.UTF8, "application/json")
+                    Content = new StringContent(@"{""logging"": ""success""}", Encoding.UTF8, "application/json")
                 };
             }
             catch (Exception e)
