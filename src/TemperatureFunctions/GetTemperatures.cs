@@ -15,7 +15,7 @@ namespace TemperatureFunctions
     public static class GetTemperatures
     {
         [FunctionName("GetTemperatures")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "GetTemperatures/query")]HttpRequestMessage req, TraceWriter log)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetTemperatures/query")]HttpRequestMessage req, TraceWriter log)
         {
             var dayMilliseconds = 86400000;
             long value = 1;
