@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
+using TemperatureFunctions.CQRS;
 using TemperatureFunctions.Dto;
 
 namespace TemperatureFunctions
@@ -15,18 +16,26 @@ namespace TemperatureFunctions
     {
         [FunctionName("RegisterTemperatures")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, TraceWriter log)
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequestMessage req,
+            TraceWriter log)
         {
-            log.Info("C# HTTP trigger function processed a request.");
-
-            var registration = new TemperatureRegistration {Temperature = 20, TimeStamp = DateTime.Now};
-            var json = JsonConvert.SerializeObject(registration);
-
-
-            return new HttpResponseMessage(HttpStatusCode.OK)
+            try
             {
-                Content = new StringContent(json, Encoding.UTF8, "application/json")
-            };
+                log.Info("C# HTTP trigger function processed a request.");
+
+                var data = await req.Content.ReadAsStringAsync();
+                var temperature = JsonConvert.DeserializeObject<TemperatureRegistration>(data);
+
+                var commandExecutor = new CommandExecutor();
+                await commandExecutor.Handle(temperature);
+
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                log.Error("RegisterTemperatures crashed", e);
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+            }
         }
     }
 }
