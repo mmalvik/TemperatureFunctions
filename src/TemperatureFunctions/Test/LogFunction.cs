@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
+using Newtonsoft.Json;
+using TemperatureFunctions.Dto;
 
 namespace TemperatureFunctions.Test
 {
@@ -19,14 +21,19 @@ namespace TemperatureFunctions.Test
             {
                 log.Info("C# HTTP trigger function processed a request.");
 
-                if (req.Content != null)
+                if (req == null)
                 {
-                    log.Info("Data sent: ", req.Content.ToString());
+                    return new HttpResponseMessage(HttpStatusCode.InternalServerError);
                 }
+
+                var data = await req.Content.ReadAsStringAsync();
+                var temperature = JsonConvert.DeserializeObject<TemperatureRegistration>(data);
+
+                log.Info($"Temperature: {temperature.Temperature} Time: {temperature.TimeStamp.Date}");
 
                 return new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StringContent(@"{""logging"": ""success""}", Encoding.UTF8, "application/json")
+                    Content = new StringContent(data, Encoding.UTF8, "application/json")
                 };
             }
             catch (Exception e)
