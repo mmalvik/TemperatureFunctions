@@ -17,6 +17,9 @@ namespace TemperatureFunctions
         [FunctionName("GetTemperatures")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetTemperatures/query")]HttpRequestMessage req, TraceWriter log)
         {
+            var requestData = await req.Content.ReadAsStringAsync();
+            log.Info($"GetTemperatures/query called with: \n {requestData}");
+
             var dayMilliseconds = 86400000;
             long value = 1;
             var date = DateTime.Now;
