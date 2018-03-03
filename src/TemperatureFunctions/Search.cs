@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,8 @@ namespace TemperatureFunctions
             var requestData = await req.Content.ReadAsStringAsync();
             log.Info($"GetTemperatures/query called with: \n {requestData}");
 
-            var json = JsonConvert.SerializeObject(new TargetObj {Target = "temperature"});
+            var targets = new List<string>{"tempOne", "targetTwo"};
+            var json = JsonConvert.SerializeObject(targets);
 
             return new HttpResponseMessage
             {
