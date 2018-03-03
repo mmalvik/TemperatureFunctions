@@ -1,17 +1,16 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using TemperatureFunctions.CQRS;
 using TemperatureFunctions.Dto;
 using TemperatureFunctions.Grafana;
-using TemperatureFunctions.Grafana.Extensions;
 
 namespace TemperatureFunctions
 {
@@ -24,14 +23,13 @@ namespace TemperatureFunctions
             var request = TimeSerieRequest.FromJson(requestData);
 
             var queryExecutor = new QueryExecutor();
-            //var query = new SqlQuerySpec("SELECT c.temperature, c._ts FROM c WHERE c._ts >= @timestampFrom AND c._ts <= @timestampTo", 
-            //    new SqlParameterCollection
-            //    {
-            //        new SqlParameter("@timestampFrom", request.Range.From.ToUnixTimeSeconds()),
-            //        new SqlParameter("@timestampTo", request.Range.To.ToUnixTimeSeconds())
-            //    });
-            var query = new SqlQuerySpec(
-                "SELECT c.temperature, c.timeStamp FROM c");
+            var query = new SqlQuerySpec("SELECT c.temperature, c._ts FROM c WHERE c._ts >= @timestampFrom AND c._ts <= @timestampTo",
+                new SqlParameterCollection
+                {
+                    new SqlParameter("@timestampFrom", request.Range.From.ToUnixTimeSeconds()),
+                    new SqlParameter("@timestampTo", request.Range.To.ToUnixTimeSeconds())
+                });
+
             var result = await queryExecutor.Execute<TemperatureRegistration>(query);
 
             var timeseries = AddToTimeSeriesData("tempOne", result, 1);
@@ -53,7 +51,8 @@ namespace TemperatureFunctions
             var datapoint = new List<List<long>>();
             foreach (var registration in registrations)
             {
-                datapoint.Add(new List<long>{ registration.Temperature*factor, registration.TimeStamp.MillisecondsFromUnixEpoch()});    
+                var tsMilliseconds = registration.Ts * 1000;
+                datapoint.Add(new List<long>{ registration.Temperature*factor, tsMilliseconds});    
             }
 
             timeSeries.Target = target;
