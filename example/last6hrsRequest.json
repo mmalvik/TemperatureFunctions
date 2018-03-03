@@ -1,0 +1,37 @@
+{
+  "timezone": "browser",
+  "panelId": 1,
+  "range": {
+    "from": "2018-03-03T06:43:37.851Z",
+    "to": "2018-03-03T12:43:37.851Z",
+    "raw": {
+      "from": "now-6h",
+      "to": "now"
+    }
+  },
+  "rangeRaw": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "interval": "10s",
+  "intervalMs": 10000,
+  "targets": [
+    {
+      "target": "tempOne",
+      "refId": "A",
+      "type": "timeserie"
+    }
+  ],
+  "format": "json",
+  "maxDataPoints": 1920,
+  "scopedVars": {
+    "__interval": {
+      "text": "10s",
+      "value": "10s"
+    },
+    "__interval_ms": {
+      "text": 10000,
+      "value": 10000
+    }
+  }
+}
