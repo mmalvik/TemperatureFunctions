@@ -6,6 +6,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
+using TemperatureFunctions.Grafana;
 
 namespace TemperatureFunctions
 {
@@ -17,20 +18,13 @@ namespace TemperatureFunctions
             var requestData = await req.Content.ReadAsStringAsync();
             log.Info($"GetTemperatures/query called with: \n {requestData}");
 
-            var targets = new List<string>{"tempOne", "targetTwo"};
+            var targets = new List<string>{ GrafanaConstants.TemperatureTarget };
             var json = JsonConvert.SerializeObject(targets);
 
             return new HttpResponseMessage
             {
                 Content = new StringContent(json, Encoding.UTF8, "application/json")
             };
-        }
-
-        private class TargetObj
-        {
-            [JsonProperty("target")]
-            public string Target { get; set; }
-
         }
     }
 }

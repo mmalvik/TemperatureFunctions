@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace TemperatureFunctions.Grafana
 {
@@ -40,10 +41,10 @@ namespace TemperatureFunctions.Grafana
     public partial class Range
     {
         [JsonProperty("from")]
-        public System.DateTimeOffset From { get; set; }
+        public DateTimeOffset From { get; set; }
 
         [JsonProperty("to")]
-        public System.DateTimeOffset To { get; set; }
+        public DateTimeOffset To { get; set; }
 
         [JsonProperty("raw")]
         public Raw Raw { get; set; }

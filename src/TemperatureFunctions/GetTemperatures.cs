@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using TemperatureFunctions.CQRS;
+using TemperatureFunctions.CQRS.Queries;
 using TemperatureFunctions.Dto;
 using TemperatureFunctions.Grafana;
 
@@ -23,21 +24,13 @@ namespace TemperatureFunctions
             var request = TimeSerieRequest.FromJson(requestData);
 
             var queryExecutor = new QueryExecutor();
-            var query = new SqlQuerySpec("SELECT c.temperature, c._ts FROM c WHERE c._ts >= @timestampFrom AND c._ts <= @timestampTo",
-                new SqlParameterCollection
-                {
-                    new SqlParameter("@timestampFrom", request.Range.From.ToUnixTimeSeconds()),
-                    new SqlParameter("@timestampTo", request.Range.To.ToUnixTimeSeconds())
-                });
+            var query = new TimeSeriesQuery(request.Range.From, request.Range.To, request.MaxDataPoints);
 
-            var result = await queryExecutor.Execute<TemperatureRegistration>(query);
+            var temperatureRegistrations = await queryExecutor.Execute<TemperatureRegistration>(query.Sql);
 
-            var timeseries = AddToTimeSeriesData("tempOne", result, 1);
-            var timeseriesTwo = AddToTimeSeriesData("tempTwo", result, 2);
+            var timeseries = AddToTimeSeriesData(GrafanaConstants.TemperatureTarget, temperatureRegistrations);
 
-            var list = new List<TimeSeries> {timeseries, timeseriesTwo};
-
-            var json = JsonConvert.SerializeObject(list.ToArray());
+            var json = JsonConvert.SerializeObject(new List<TimeSeries> { timeseries });
 
             return new HttpResponseMessage
             {
@@ -45,19 +38,18 @@ namespace TemperatureFunctions
             };
         }
 
-        private static TimeSeries AddToTimeSeriesData(string target, IEnumerable<TemperatureRegistration> registrations, int factor)
+        private static TimeSeries AddToTimeSeriesData(string target, IEnumerable<TemperatureRegistration> registrations)
         {
             var timeSeries = new TimeSeries();
             var datapoint = new List<List<long>>();
             foreach (var registration in registrations)
             {
-                var tsMilliseconds = registration.Ts * 1000;
-                datapoint.Add(new List<long>{ registration.Temperature*factor, tsMilliseconds});    
+                var epochTimestampMilliseconds = registration.Ts * 1000;
+                datapoint.Add(new List<long>{ registration.Temperature, epochTimestampMilliseconds });    
             }
 
             timeSeries.Target = target;
-            var points = datapoint.Select(x => x.ToArray()).ToArray();
-            timeSeries.Datapoints = points;
+            timeSeries.Datapoints = datapoint.Select(x => x.ToArray()).ToArray();
 
             return timeSeries;
         }
