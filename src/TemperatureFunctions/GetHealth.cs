@@ -10,7 +10,7 @@ namespace TemperatureFunctions
     public static class GetHealth
     {
         [FunctionName("GetHealth")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "GetTemperatures")]HttpRequestMessage req, TraceWriter log)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "GetTemperatures")]HttpRequestMessage req, TraceWriter log)
         {
             var requestData = await req.Content.ReadAsStringAsync();
             log.Info($"GetTemperatures/query called with: \n {requestData}");
