@@ -10,5 +10,8 @@ namespace TemperatureFunctions.Dto
 
         [JsonProperty("timeStamp")]
         public DateTime TimeStamp { get; set; }
+
+        [JsonProperty("_ts")]
+        public long Ts { get; set; }
     }
 }
